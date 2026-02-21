@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import db from '../database/init.js';
 import tongyiService from '../services/tongyi.js';
 import ossService from '../services/oss.js';
+import videoComposer from '../services/videoComposer.js';
 import { wss } from '../index.js';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
@@ -82,50 +83,106 @@ class VideoPipeline {
       // 3. 生成各个场景的视频
       const videoUrls = [];
       const totalScenes = script.scenes.length;
-      
+      let hasSuccessfulVideo = false;
+
       for (let i = 0; i < totalScenes; i++) {
         const scene = script.scenes[i];
-        const progress = 20 + Math.floor((i / totalScenes) * 60);
-        
+        const progress = 20 + Math.floor((i / totalScenes) * 50);
+
         this.updateTaskStatus(taskId, 'generating_videos', progress);
         this.broadcastProgress(taskId, progress, `正在生成场景 ${i + 1}/${totalScenes}...`);
-        
+
         try {
           // 调用通义万相生成视频
           const videoUrl = await tongyiService.generateVideo(
             scene.visual_prompt,
             scene.duration
           );
-          
+
           videoUrls.push(videoUrl);
-          
+          hasSuccessfulVideo = true;
+
           // 更新场景状态
           const updateScene = db.prepare('UPDATE scenes SET video_url = ?, status = ? WHERE task_id = ? AND scene_number = ?');
           updateScene.run(videoUrl, 'completed', taskId, scene.scene_number);
         } catch (error) {
           console.error(`场景 ${i + 1} 生成失败:`, error);
           videoUrls.push(null);
+          // 更新场景状态为失败
+          const updateScene = db.prepare('UPDATE scenes SET status = ? WHERE task_id = ? AND scene_number = ?');
+          updateScene.run('failed', taskId, scene.scene_number);
         }
       }
-      
-      // 4. 合成视频（这里简化处理，实际需要使用 FFmpeg）
-      this.updateTaskStatus(taskId, 'compositing', 85);
-      this.broadcastProgress(taskId, 85, '正在合成最终视频...');
-      
-      // TODO: 使用 FFmpeg 合成多个视频片段
-      // 这里暂时返回第一个视频作为示例
-      const finalVideoUrl = videoUrls[0];
-      
-      // 5. 上传到 OSS（如果需要）
-      this.updateTaskStatus(taskId, 'uploading', 95);
-      this.broadcastProgress(taskId, 95, '正在上传到云存储...');
-      
-      // 假设视频已经在 OSS 或者使用通义万相返回的 URL
-      
+
+      // 检查是否至少有一个视频生成成功
+      if (!hasSuccessfulVideo) {
+        throw new Error('所有场景视频生成失败，无法完成视频合成');
+      }
+
+      // 4. 合成视频（使用 MP4Box 或 FFmpeg 拼接多个场景）
+      this.updateTaskStatus(taskId, 'compositing', 75);
+      this.broadcastProgress(taskId, 75, '正在合成最终视频...');
+
+      let finalVideoPath = null;
+      let composedUrl = null;
+
+      // 过滤掉失败的视频
+      const validVideoUrls = videoUrls.filter(url => url !== null);
+
+      if (validVideoUrls.length === 0) {
+        throw new Error('没有可用的视频片段');
+      }
+
+      if (validVideoUrls.length === 1) {
+        // 只有一个视频，直接使用
+        composedUrl = validVideoUrls[0];
+        console.log('ℹ️ 只有一个视频片段，跳过拼接');
+      } else {
+        // 多个视频，需要拼接
+        try {
+          console.log(`🎬 开始拼接 ${validVideoUrls.length} 个视频片段...`);
+          finalVideoPath = await videoComposer.composeVideos(validVideoUrls, taskId);
+          console.log(`✅ 视频拼接完成: ${finalVideoPath}`);
+        } catch (error) {
+          console.error('⚠️ 视频拼接失败，使用第一个视频:', error.message);
+          composedUrl = validVideoUrls[0];
+        }
+      }
+
+      // 5. 上传到 OSS
+      this.updateTaskStatus(taskId, 'uploading', 85);
+      this.broadcastProgress(taskId, 85, '正在上传到云存储...');
+
+      let ossUrl = null;
+      if (ossService.isConfigured()) {
+        try {
+          let result;
+          if (finalVideoPath) {
+            // 上传拼接后的本地视频
+            const objectName = `videos/${taskId}/final_composed.mp4`;
+            result = await ossService.uploadFile(objectName, finalVideoPath);
+          } else {
+            // 使用单个视频 URL
+            const objectName = `videos/${taskId}/final.mp4`;
+            result = await ossService.downloadAndUpload(composedUrl, objectName);
+          }
+          ossUrl = result.publicUrl;
+          console.log(`✅ 视频已上传到 OSS: ${ossUrl}`);
+        } catch (error) {
+          console.error('⚠️  OSS 上传失败，使用原始 URL:', error.message);
+          // 如果 OSS 上传失败，使用原始 URL
+          ossUrl = composedUrl || validVideoUrls[0];
+        }
+      } else {
+        // OSS 未配置，直接使用原始 URL
+        ossUrl = composedUrl || validVideoUrls[0];
+        console.log('ℹ️  OSS 未配置，使用原始视频 URL');
+      }
+
       // 6. 完成
-      this.updateTaskStatus(taskId, 'completed', 100, finalVideoUrl);
+      this.updateTaskStatus(taskId, 'completed', 100, ossUrl);
       this.broadcastProgress(taskId, 100, '视频生成完成！');
-      
+
       console.log(`✅ 任务完成: ${taskId}`);
     } catch (error) {
       console.error(`❌ 任务执行失败: ${taskId}`, error);

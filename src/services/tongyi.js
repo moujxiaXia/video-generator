@@ -100,26 +100,27 @@ class TongyiService {
   async generateVideo(prompt, duration = 5) {
     try {
       console.log(`🎬 调用通义万相生成视频: ${prompt.substring(0, 50)}...`);
-      
-      // 注意：这里使用的是模拟实现
-      // 实际需要根据阿里云通义万相的具体 API 文档调整
+
+      // 限制时长在有效范围内 (2-15秒)
+      const validDuration = Math.min(Math.max(duration, 2), 15);
+
       const response = await axios.post(
-        `${this.baseUrl}/services/aigc/video-generation/generation`,
+        `${this.baseUrl}/services/aigc/video-generation/video-synthesis`,
         {
-          model: 'wanx-video-generation',
+          model: 'wan2.6-t2v',
           input: {
             prompt: prompt
           },
           parameters: {
-            duration: duration,
-            resolution: '1280x720',
-            fps: 30
+            size: '1280*720',
+            duration: validDuration
           }
         },
         {
           headers: {
             'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-DashScope-Async': 'enable'
           }
         }
       );
@@ -127,11 +128,15 @@ class TongyiService {
       // 获取任务 ID
       const taskId = response.data.output.task_id;
       console.log(`⏳ 视频生成任务已提交，任务ID: ${taskId}`);
-      
+
       // 轮询任务状态
       return await this.pollVideoTask(taskId);
     } catch (error) {
       console.error('❌ 视频生成失败:', error.message);
+      if (error.response) {
+        console.error('响应状态:', error.response.status);
+        console.error('响应数据:', error.response.data);
+      }
       throw error;
     }
   }
@@ -141,7 +146,7 @@ class TongyiService {
    * @param {string} taskId - 任务 ID
    * @returns {Promise<string>} - 视频 URL
    */
-  async pollVideoTask(taskId, maxRetries = 60) {
+  async pollVideoTask(taskId, maxRetries = 120) {
     for (let i = 0; i < maxRetries; i++) {
       try {
         const response = await axios.get(
@@ -154,22 +159,23 @@ class TongyiService {
         );
 
         const status = response.data.output.task_status;
-        
+
         if (status === 'SUCCEEDED') {
-          const videoUrl = response.data.output.video_url;
+          const videoUrl = response.data.output.video_url || response.data.output.results?.[0]?.url;
           console.log(`✅ 视频生成成功: ${videoUrl}`);
           return videoUrl;
         } else if (status === 'FAILED') {
-          throw new Error('视频生成失败');
+          const errorMessage = response.data.output.message || '视频生成失败';
+          throw new Error(errorMessage);
         }
-        
-        console.log(`⏳ 等待视频生成... (${i + 1}/${maxRetries})`);
+
+        console.log(`⏳ 等待视频生成... (${i + 1}/${maxRetries}) - 状态: ${status}`);
         await new Promise(resolve => setTimeout(resolve, 5000)); // 等待5秒
       } catch (error) {
         if (i === maxRetries - 1) throw error;
       }
     }
-    
+
     throw new Error('视频生成超时');
   }
 
