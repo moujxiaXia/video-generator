@@ -1,0 +1,44 @@
+{
+  "rules": {
+    "min_duration": 10,
+    "max_duration": 180,
+    "default_fps": 30,
+    "default_resolution": "1280x720",
+    "scene_transition": {
+      "min_scene_duration": 3,
+      "max_scenes": 10,
+      "transition_types": ["fade", "cut", "dissolve"],
+      "auto_transition": true
+    },
+    "content_policy": {
+      "blocked_keywords": ["暴力", "色情", "政治敏感", "血腥"],
+      "nsfw_filter": true,
+      "watermark": false
+    },
+    "quality": {
+      "min_bitrate": "5000k",
+      "codec": "h264",
+      "color_space": "bt709",
+      "audio_sample_rate": 48000,
+      "audio_bitrate": "192k"
+    }
+  },
+  "script_template": {
+    "min_scenes": 3,
+    "max_scenes": 8,
+    "scene_structure": {
+      "description_length": {
+        "min": 50,
+        "max": 200
+      },
+      "visual_prompt_length": {
+        "min": 20,
+        "max": 100
+      },
+      "duration_range": {
+        "min": 3,
+        "max": 15
+      }
+    }
+  }
+}

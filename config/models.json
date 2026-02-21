@@ -1,0 +1,20 @@
+{
+  "llm": {
+    "provider": "dashscope",
+    "model": "qwen-max",
+    "temperature": 0.7,
+    "max_tokens": 2000
+  },
+  "video": {
+    "provider": "tongyi",
+    "model": "wanx-video-generation",
+    "default_duration": 5,
+    "default_resolution": "1280x720",
+    "default_fps": 30
+  },
+  "tts": {
+    "provider": "dashscope",
+    "model": "sambert-zhichu-v1",
+    "voice": "zhixiaoxia"
+  }
+}

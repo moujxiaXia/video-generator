@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 视频生成器 - 一句话生成连续视频</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        .input-section label {
+            display: block;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .input-section textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-section textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-section {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .progress-message {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .result-section {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .video-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .video-container video {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .script-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .script-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .scene {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        
+        .scene-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .error-message {
+            display: none;
+            padding: 15px;
+            background: #fee;
+            border-left: 4px solid #f00;
+            border-radius: 5px;
+            color: #c00;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI 视频生成器</h1>
+            <p>输入一句话，AI 帮你生成完整的连续视频</p>
+        </div>
+        
+        <div class="card">
+            <div class="input-section">
+                <label for="userInput">描述你想生成的视频内容：</label>
+                <textarea 
+                    id="userInput" 
+                    placeholder="例如：一个关于春天来临的短视频，展现花朵绽放、小鸟歌唱、春风拂面的美好画面"
+                ></textarea>
+            </div>
+            
+            <button class="generate-btn" id="generateBtn" onclick="generateVideo()">
+                开始生成视频
+            </button>
+            
+            <div class="error-message" id="errorMessage"></div>
+            
+            <div class="progress-section" id="progressSection">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="progress-message" id="progressMessage">准备中...</div>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <h2>生成结果</h2>
+                
+                <div class="video-container" id="videoContainer">
+                    <!-- 视频将动态插入这里 -->
+                </div>
+                
+                <div class="script-section" id="scriptSection">
+                    <h3>视频脚本</h3>
+                    <div id="scriptContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTaskId = null;
+        let ws = null;
+
+        // 建立 WebSocket 连接
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}`);
+            
+            ws.onopen = () => {
+                console.log('WebSocket 连接已建立');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'progress' && data.taskId === currentTaskId) {
+                    updateProgress(data.progress, data.message);
+                }
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket 错误:', error);
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket 连接已关闭');
+                // 5秒后重连
+                setTimeout(connectWebSocket, 5000);
+            };
+        }
+
+        // 页面加载时连接 WebSocket
+        window.addEventListener('load', connectWebSocket);
+
+        async function generateVideo() {
+            const userInput = document.getElementById('userInput').value.trim();
+            
+            if (!userInput) {
+                showError('请输入视频描述');
+                return;
+            }
+            
+            // 重置界面
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('generateBtn').disabled = true;
+            
+            try {
+                // 创建任务
+                const response = await fetch('/api/video/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userInput })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || '生成失败');
+                }
+                
+                currentTaskId = result.data.taskId;
+                console.log('任务已创建:', currentTaskId);
+                
+                // 轮询任务状态
+                pollTaskStatus(currentTaskId);
+            } catch (error) {
+                showError(error.message);
+                document.getElementById('progressSection').style.display = 'none';
+                document.getElementById('generateBtn').disabled = false;
+            }
+        }
+
+        async function pollTaskStatus(taskId) {
+            const maxRetries = 120; // 最多轮询 10 分钟
+            let retries = 0;
+            
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/video/status/${taskId}`);
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        throw new Error(result.error);
+                    }
+                    
+                    const task = result.data;
+                    
+                    if (task.status === 'completed') {
+                        clearInterval(interval);
+                        showResult(task);
+                        document.getElementById('generateBtn').disabled = false;
+                    } else if (task.status === 'failed') {
+                        clearInterval(interval);
+                        showError(task.error || '生成失败');
+                        document.getElementById('progressSection').style.display = 'none';
+                        document.getElementById('generateBtn').disabled = false;
+                    }
+                    
+                    retries++;
+                    if (retries >= maxRetries) {
+                        clearInterval(interval);
+                        showError('任务超时');
+                        document.getElementById('progressSection').style.display = 'none';
+                        document.getElementById('generateBtn').disabled = false;
+                    }
+                } catch (error) {
+                    console.error('轮询错误:', error);
+                }
+            }, 5000); // 每 5 秒查询一次
+        }
+
+        function updateProgress(progress, message) {
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = progress + '%';
+            document.getElementById('progressMessage').textContent = message;
+        }
+
+        function showResult(task) {
+            document.getElementById('progressSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 显示视频
+            if (task.output_url) {
+                const videoContainer = document.getElementById('videoContainer');
+                videoContainer.innerHTML = `
+                    <video controls>
+                        <source src="${task.output_url}" type="video/mp4">
+                        您的浏览器不支持视频标签。
+                    </video>
+                `;
+            }
+            
+            // 显示脚本
+            if (task.script) {
+                const script = typeof task.script === 'string' ? JSON.parse(task.script) : task.script;
+                const scriptContent = document.getElementById('scriptContent');
+                
+                let html = `<h4>${script.title || '视频脚本'}</h4>`;
+                
+                if (script.scenes) {
+                    script.scenes.forEach(scene => {
+                        html += `
+                            <div class="scene">
+                                <div class="scene-title">场景 ${scene.scene_number}（${scene.duration}秒）</div>
+                                <div><strong>描述：</strong>${scene.description}</div>
+                                <div><strong>视觉提示：</strong>${scene.visual_prompt}</div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                scriptContent.innerHTML = html;
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "user_tiers": {
+    "free": {
+      "max_video_length": 30,
+      "daily_quota": 3,
+      "resolution": "720p",
+      "concurrent_tasks": 1,
+      "storage_limit_mb": 500
+    },
+    "premium": {
+      "max_video_length": 180,
+      "daily_quota": 50,
+      "resolution": "1080p",
+      "concurrent_tasks": 5,
+      "storage_limit_mb": 10240
+    }
+  },
+  "rate_limits": {
+    "requests_per_minute": 10,
+    "requests_per_hour": 100
+  }
+}
