@@ -4,6 +4,7 @@ node_modules/
 .DS_Store
 database/*.db
 database/*.db-*
+database/data.json
 output/
 temp/
 uploads/
