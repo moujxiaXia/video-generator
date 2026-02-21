@@ -1,5 +1,6 @@
 import express from 'express';
 import videoPipeline from '../pipeline/video.js';
+import db from '../database/init.js';
 
 const router = express.Router();
 

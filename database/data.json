@@ -1,0 +1,50 @@
+{
+  "video_tasks": [
+    {
+      "id": "9ff2392d-06ff-41e5-a8e2-b6de5a3f135c",
+      "user_input": "测试视频生成",
+      "script": null,
+      "status": "failed",
+      "progress": 0,
+      "output_url": null,
+      "error": "Request failed with status code 401",
+      "created_at": "2026-02-21T09:36:36.235Z",
+      "updated_at": "2026-02-21T09:36:36.516Z"
+    },
+    {
+      "id": "dd01a1c3-3ea9-4ce2-8930-f94d56a5d097",
+      "user_input": "测试任务状态查询",
+      "script": null,
+      "status": "failed",
+      "progress": 0,
+      "output_url": null,
+      "error": "Request failed with status code 401",
+      "created_at": "2026-02-21T09:36:36.310Z",
+      "updated_at": "2026-02-21T09:36:36.566Z"
+    },
+    {
+      "id": "03e696df-2f13-4b9c-8835-5adbb5d64164",
+      "user_input": "测试视频生成",
+      "script": null,
+      "status": "generating_script",
+      "progress": 10,
+      "output_url": null,
+      "error": null,
+      "created_at": "2026-02-21T09:37:22.830Z",
+      "updated_at": "2026-02-21T09:37:22.830Z"
+    },
+    {
+      "id": "1b072778-e1c4-47a4-a757-b93cba874877",
+      "user_input": "测试任务状态查询",
+      "script": null,
+      "status": "generating_script",
+      "progress": 10,
+      "output_url": null,
+      "error": null,
+      "created_at": "2026-02-21T09:37:22.903Z",
+      "updated_at": "2026-02-21T09:37:22.903Z"
+    }
+  ],
+  "scenes": [],
+  "users": []
+}
