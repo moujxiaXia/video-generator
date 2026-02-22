@@ -124,7 +124,6 @@ class VideoPipeline {
       this.broadcastProgress(taskId, 75, '正在合成最终视频...');
 
       let finalVideoPath = null;
-      let composedUrl = null;
 
       // 过滤掉失败的视频
       const validVideoUrls = videoUrls.filter(url => url !== null);
@@ -133,20 +132,14 @@ class VideoPipeline {
         throw new Error('没有可用的视频片段');
       }
 
-      if (validVideoUrls.length === 1) {
-        // 只有一个视频，直接使用
-        composedUrl = validVideoUrls[0];
-        console.log('ℹ️ 只有一个视频片段，跳过拼接');
-      } else {
-        // 多个视频，需要拼接
-        try {
-          console.log(`🎬 开始拼接 ${validVideoUrls.length} 个视频片段...`);
-          finalVideoPath = await videoComposer.composeVideos(validVideoUrls, taskId);
-          console.log(`✅ 视频拼接完成: ${finalVideoPath}`);
-        } catch (error) {
-          console.error('⚠️ 视频拼接失败，使用第一个视频:', error.message);
-          composedUrl = validVideoUrls[0];
-        }
+      // 强制下载所有视频到本地并拼接
+      try {
+        console.log(`🎬 开始下载并拼接 ${validVideoUrls.length} 个视频片段...`);
+        finalVideoPath = await videoComposer.composeVideos(validVideoUrls, taskId);
+        console.log(`✅ 视频拼接完成: ${finalVideoPath}`);
+      } catch (error) {
+        console.error('⚠️ 视频拼接失败:', error.message);
+        throw new Error(`视频拼接失败: ${error.message}`);
       }
 
       // 5. 上传到 OSS
@@ -156,27 +149,19 @@ class VideoPipeline {
       let ossUrl = null;
       if (ossService.isConfigured()) {
         try {
-          let result;
-          if (finalVideoPath) {
-            // 上传拼接后的本地视频
-            const objectName = `videos/${taskId}/final_composed.mp4`;
-            result = await ossService.uploadFile(objectName, finalVideoPath);
-          } else {
-            // 使用单个视频 URL
-            const objectName = `videos/${taskId}/final.mp4`;
-            result = await ossService.downloadAndUpload(composedUrl, objectName);
-          }
+          // 上传拼接后的本地视频到 OSS
+          const objectName = `videos/${taskId}/final_composed.mp4`;
+          const result = await ossService.uploadFile(objectName, finalVideoPath);
           ossUrl = result.publicUrl;
           console.log(`✅ 视频已上传到 OSS: ${ossUrl}`);
         } catch (error) {
-          console.error('⚠️  OSS 上传失败，使用原始 URL:', error.message);
-          // 如果 OSS 上传失败，使用原始 URL
-          ossUrl = composedUrl || validVideoUrls[0];
+          console.error('⚠️  OSS 上传失败:', error.message);
+          throw new Error(`OSS 上传失败: ${error.message}`);
         }
       } else {
-        // OSS 未配置，直接使用原始 URL
-        ossUrl = composedUrl || validVideoUrls[0];
-        console.log('ℹ️  OSS 未配置，使用原始视频 URL');
+        // OSS 未配置，使用本地文件路径
+        ossUrl = finalVideoPath;
+        console.log('ℹ️  OSS 未配置，使用本地视频文件');
       }
 
       // 6. 完成

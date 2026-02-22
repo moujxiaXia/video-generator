@@ -138,21 +138,25 @@ class VideoComposer {
 
     console.log(`🎬 开始处理 ${validUrls.length} 个视频片段...`);
 
-    // 创建任务临时目录
+    // 创建任务临时目录（使用 scenes 子目录保存各段视频）
     const taskTempDir = join(this.tempDir, `compose_${taskId}`);
-    if (!existsSync(taskTempDir)) {
-      mkdirSync(taskTempDir, { recursive: true });
+    const scenesDir = join(taskTempDir, 'scenes');
+    if (!existsSync(scenesDir)) {
+      mkdirSync(scenesDir, { recursive: true });
     }
 
-    // 下载所有视频
+    // 下载所有视频到本地 scenes 目录
     const localPaths = [];
     for (let i = 0; i < validUrls.length; i++) {
-      const localPath = join(taskTempDir, `scene_${i + 1}.mp4`);
+      const localPath = join(scenesDir, `scene_${String(i + 1).padStart(2, '0')}.mp4`);
       try {
+        console.log(`📥 下载场景 ${i + 1}/${validUrls.length}...`);
         await this.downloadVideo(validUrls[i], localPath);
         localPaths.push(localPath);
+        console.log(`✅ 场景 ${i + 1} 下载完成: ${localPath}`);
       } catch (error) {
-        console.error(`❌ 场景 ${i + 1} 下载失败，跳过:`, error.message);
+        console.error(`❌ 场景 ${i + 1} 下载失败:`, error.message);
+        throw new Error(`场景 ${i + 1} 下载失败: ${error.message}`);
       }
     }
 
@@ -160,16 +164,17 @@ class VideoComposer {
       throw new Error('所有视频下载失败');
     }
 
-    // 拼接视频
+    console.log(`📁 所有视频已下载到: ${scenesDir}`);
+    console.log(`📊 成功下载 ${localPaths.length}/${validUrls.length} 个视频片段`);
+
+    // 拼接视频到输出目录
     const outputPath = join(this.outputDir, `${taskId}_final.mp4`);
     await this.concatVideos(localPaths, outputPath);
 
-    // 清理临时文件
-    try {
-      const fs = await import('fs');
-      fs.rmSync(taskTempDir, { recursive: true, force: true });
-      console.log('🧹 临时文件已清理');
-    } catch (e) {}
+    console.log(`✅ 拼接完成，输出文件: ${outputPath}`);
+
+    // 保留原始视频片段，不清理（可用于调试或备份）
+    console.log(`ℹ️  原始视频片段保留在: ${scenesDir}`);
 
     return outputPath;
   }

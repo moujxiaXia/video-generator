@@ -131,6 +131,17 @@
       "error": null,
       "created_at": "2026-02-21T15:46:36.716Z",
       "updated_at": "2026-02-21T15:55:14.788Z"
+    },
+    {
+      "id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "user_input": "布偶猫在草地上跳舞，不小心摔倒了，觉得丢面子，有点生气。",
+      "script": "{\"title\":\"布偶猫草地上的小插曲\",\"total_duration\":60,\"scenes\":[{\"scene_number\":1,\"description\":\"阳光明媚的一天，一只可爱的布偶猫在一片绿油油的草地上欢快地跳跃着，背景是蓝天白云。\",\"visual_prompt\":\"明亮温暖的日光下，中景镜头捕捉到一只白色布偶猫轻盈地在绿色草地上跳动。天空湛蓝，几朵白云悠闲地飘过。\",\"duration\":10},{\"scene_number\":2,\"description\":\"随着音乐节奏加快，布偶猫尝试做一个更高难度的动作，但显然它低估了自己的能力。\",\"visual_prompt\":\"特写镜头跟随猫咪做动作时的表情变化，从自信满满到突然惊慌失措。使用慢动作展示它尝试高难度跳跃的过程。\",\"duration\":8},{\"scene_number\":3,\"description\":\"布偶猫失去平衡，在空中翻了个跟头后重重地摔在地上，发出轻微的“喵”声。\",\"visual_prompt\":\"低角度拍摄猫咪摔倒瞬间，可以看到草地细节与蓝天形成对比。注意表现猫咪落地时地面轻微震动的效果。\",\"duration\":5},{\"scene_number\":4,\"description\":\"躺在地上的布偶猫试图站起来，但似乎有些困难，它用爪子摸了摸自己的脸，显得很尴尬。\",\"visual_prompt\":\"近景展现猫咪挣扎起身的样子，以及它用前爪轻轻触碰脸颊的动作。周围环境保持安静，只有偶尔吹过的微风。\",\"duration\":7},{\"scene_number\":5,\"description\":\"最终站稳后的布偶猫环顾四周，发现没有人注意到它的失误，但它还是感到非常丢脸。\",\"visual_prompt\":\"全景镜头显示空旷的草地和远处的树木。猫咪站在中央，眼神里充满了羞愧与不满。\",\"duration\":6},{\"scene_number\":6,\"description\":\"愤怒之下，布偶猫开始对着空气做出踢打的动作，仿佛是在向看不见的观众发泄不满。\",\"visual_prompt\":\"快速剪辑几个不同角度的镜头，展示猫咪生气时踢腿、挥爪的行为。背景逐渐暗淡下来，强调其情绪。\",\"duration\":9}]}",
+      "status": "completed",
+      "progress": 100,
+      "output_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/29/20260222/66dce5b6/17058851-1ufAkM1U_0451b8281735.mp4?Expires=1771844095&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=YMwYWyiVxW92L3PBDpjph4PL858%3D",
+      "error": null,
+      "created_at": "2026-02-22T10:53:11.127Z",
+      "updated_at": "2026-02-22T11:02:44.343Z"
     }
   ],
   "scenes": [
@@ -639,6 +650,72 @@
       "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/16/20260221/66dce5b6/3743027-OSvgz82Q_1172c212c36b.mp4?Expires=1771775637&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=Y8faRtLDvuSDQ8lyYDuatokxy2c%3D",
       "status": "completed",
       "created_at": "2026-02-21T15:47:06.529Z"
+    },
+    {
+      "id": "1eb4abfb-1fa6-4a0e-9c97-2e5d040b92d5",
+      "task_id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "scene_number": 1,
+      "description": "阳光明媚的一天，一只可爱的布偶猫在一片绿油油的草地上欢快地跳跃着，背景是蓝天白云。",
+      "visual_prompt": "明亮温暖的日光下，中景镜头捕捉到一只白色布偶猫轻盈地在绿色草地上跳动。天空湛蓝，几朵白云悠闲地飘过。",
+      "duration": 10,
+      "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/29/20260222/66dce5b6/17058851-1ufAkM1U_0451b8281735.mp4?Expires=1771844095&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=YMwYWyiVxW92L3PBDpjph4PL858%3D",
+      "status": "completed",
+      "created_at": "2026-02-22T10:53:44.218Z"
+    },
+    {
+      "id": "aa503728-bf4b-40f9-b047-e8476bfde256",
+      "task_id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "scene_number": 2,
+      "description": "随着音乐节奏加快，布偶猫尝试做一个更高难度的动作，但显然它低估了自己的能力。",
+      "visual_prompt": "特写镜头跟随猫咪做动作时的表情变化，从自信满满到突然惊慌失措。使用慢动作展示它尝试高难度跳跃的过程。",
+      "duration": 8,
+      "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/de/20260222/66dce5b6/13436366-zImEeaHC_2f743a31ede7.mp4?Expires=1771844186&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=VcZBJyyj122s%2BMEUyIlr%2BE5u%2Fic%3D",
+      "status": "completed",
+      "created_at": "2026-02-22T10:53:44.218Z"
+    },
+    {
+      "id": "8d32df1b-ecd8-4887-aac0-9b21ffd5ec67",
+      "task_id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "scene_number": 3,
+      "description": "布偶猫失去平衡，在空中翻了个跟头后重重地摔在地上，发出轻微的“喵”声。",
+      "visual_prompt": "低角度拍摄猫咪摔倒瞬间，可以看到草地细节与蓝天形成对比。注意表现猫咪落地时地面轻微震动的效果。",
+      "duration": 5,
+      "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/fe/20260222/66dce5b6/52729128-HTeQ2p8f_6d75512d6f70.mp4?Expires=1771844238&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=djE1kSAKd%2FXwQhxLbKsvYc8obQ0%3D",
+      "status": "completed",
+      "created_at": "2026-02-22T10:53:44.219Z"
+    },
+    {
+      "id": "b5762c0b-da07-4604-a292-9bae0dfb8130",
+      "task_id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "scene_number": 4,
+      "description": "躺在地上的布偶猫试图站起来，但似乎有些困难，它用爪子摸了摸自己的脸，显得很尴尬。",
+      "visual_prompt": "近景展现猫咪挣扎起身的样子，以及它用前爪轻轻触碰脸颊的动作。周围环境保持安静，只有偶尔吹过的微风。",
+      "duration": 7,
+      "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/bb/20260222/66dce5b6/2131356-hgO991kl_3c4010fe464e.mp4?Expires=1771844323&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=Y3XnmO%2B5cJUA9H0Z4hcI60wWHTA%3D",
+      "status": "completed",
+      "created_at": "2026-02-22T10:53:44.220Z"
+    },
+    {
+      "id": "71e18649-2c70-484b-b351-2281343588f8",
+      "task_id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "scene_number": 5,
+      "description": "最终站稳后的布偶猫环顾四周，发现没有人注意到它的失误，但它还是感到非常丢脸。",
+      "visual_prompt": "全景镜头显示空旷的草地和远处的树木。猫咪站在中央，眼神里充满了羞愧与不满。",
+      "duration": 6,
+      "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/4c/20260222/66dce5b6/54919763-OzGfWs71_751deaa47ecf.mp4?Expires=1771844400&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=1WY6ff4kWmCFTHY3ARDcygWyz5s%3D",
+      "status": "completed",
+      "created_at": "2026-02-22T10:53:44.221Z"
+    },
+    {
+      "id": "f0259ef0-cb03-4cfa-99c2-4840d4869859",
+      "task_id": "6b4c4582-60db-427e-9459-18c89cfdd2b9",
+      "scene_number": 6,
+      "description": "愤怒之下，布偶猫开始对着空气做出踢打的动作，仿佛是在向看不见的观众发泄不满。",
+      "visual_prompt": "快速剪辑几个不同角度的镜头，展示猫咪生气时踢腿、挥爪的行为。背景逐渐暗淡下来，强调其情绪。",
+      "duration": 9,
+      "video_url": "https://dashscope-a717.oss-accelerate.aliyuncs.com/1d/fd/20260222/66dce5b6/96841428-88ImM4nY_bfe437f2af10.mp4?Expires=1771844488&OSSAccessKeyId=LTAI5tPxpiCM2hjmWrFXrym1&Signature=xD4jm7%2BSpDt2CarenWGSdVFLKdE%3D",
+      "status": "completed",
+      "created_at": "2026-02-22T10:53:44.222Z"
     }
   ],
   "users": []
