@@ -83,22 +83,43 @@ class VideoComposer {
     const listContent = videoPaths.map(p => `file '${p}'`).join('\n');
     writeFileSync(listFile, listContent);
 
-    const cmd = `ffmpeg -f concat -safe 0 -i "${listFile}" -c copy "${outputPath}"`;
+    // 先尝试使用 -c copy 快速拼接
+    let cmd = `ffmpeg -f concat -safe 0 -i "${listFile}" -c copy "${outputPath}"`;
 
     console.log(`执行 ffmpeg: ${cmd}`);
 
-    execSync(cmd, {
-      cwd: this.tempDir,
-      timeout: 300000,
-      stdio: 'pipe'
-    });
+    try {
+      execSync(cmd, {
+        cwd: this.tempDir,
+        timeout: 300000,
+        stdio: 'pipe'
+      });
+      console.log(`✅ ffmpeg 拼接完成（直接复制流）: ${outputPath}`);
+    } catch (error) {
+      console.log('⚠️  直接复制失败（视频编码/分辨率/帧率可能不一致），尝试重新编码...');
+      
+      // 删除失败的输出文件（如果存在）
+      try {
+        unlinkSync(outputPath);
+      } catch (e) {}
+
+      // 重新编码拼接，统一编码格式和参数
+      cmd = `ffmpeg -f concat -safe 0 -i "${listFile}" -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "${outputPath}"`;
+      console.log(`执行 ffmpeg (重新编码): ${cmd}`);
+      
+      execSync(cmd, {
+        cwd: this.tempDir,
+        timeout: 300000,
+        stdio: 'pipe'
+      });
+      console.log(`✅ ffmpeg 拼接完成（重新编码）: ${outputPath}`);
+    }
 
     // 清理列表文件
     try {
       unlinkSync(listFile);
     } catch (e) {}
 
-    console.log(`✅ ffmpeg 拼接完成: ${outputPath}`);
     return outputPath;
   }
 
